@@ -5,14 +5,41 @@ from datetime import datetime
 
 def main():
     try:
-        print("===Настройка холодильника===")
-        main_cap = int(input("Введите вместимость основной камеры: "))
-        freezer_cap = int(input("Введите вместимость морозильной камеры: "))
-        owner_name = input("Введите имя владельца: ").strip()
+        print("=== Настройка холодильника ===")
+
+        while True:
+            try:
+                main_cap = int(input("Введите вместимость основной камеры: "))
+                if main_cap <= 0:
+                    print("Вместимость должна быть положительным числом.")
+                    continue
+                break
+            except ValueError:
+                print("Ошибка: введите целое число.")
+
+        while True:
+            try:
+                freezer_cap = int(
+                    input("Введите вместимость морозильной камеры: "))
+                if freezer_cap <= 0:
+                    print("Вместимость должна быть положительным числом.")
+                    continue
+                break
+            except ValueError:
+                print("Ошибка: введите целое число.")
+
+        while True:
+            owner_name = input("Введите имя владельца: ").strip()
+            if not owner_name:
+                print("Имя не может быть пустым.")
+                continue
+            break
+
         fridge = Refrigerator(main_cap, freezer_cap, owner_name)
         print(f"\nХолодильник готов! Владелец: {owner_name}")
         print(
-            "Перед работой с холодильником ознакомьтесь с командами(help) и авторизуйтесь.")
+            "Перед работой с холодильником ознакомьтесь с командами (help) и авторизуйтесь.")
+
         while True:
             command = input("\n>").strip()
             if not command:
