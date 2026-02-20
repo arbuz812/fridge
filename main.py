@@ -1,11 +1,23 @@
+import logging
 from refrigerator import Refrigerator
 from product import Product
 from datetime import datetime
 
 
 def main():
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.FileHandler('fridge.log', encoding='utf-8'),
+            logging.StreamHandler()
+        ]
+    )
+
+    logging.info("== Запуск программы ==")
+
     try:
-        print("=== Настройка холодильника ===")
+        logging.info("=== Настройка холодильника ===")
 
         while True:
             try:
@@ -15,7 +27,7 @@ def main():
                     continue
                 break
             except ValueError:
-                print("Ошибка: введите целое число.")
+                logging.error("Ошибка: введите целое число.")
 
         while True:
             try:
@@ -26,7 +38,7 @@ def main():
                     continue
                 break
             except ValueError:
-                print("Ошибка: введите целое число.")
+                logging.error("Ошибка: введите целое число.")
 
         while True:
             owner_name = input("Введите имя владельца: ").strip()
@@ -36,7 +48,7 @@ def main():
             break
 
         fridge = Refrigerator(main_cap, freezer_cap, owner_name)
-        print(f"\nХолодильник готов! Владелец: {owner_name}")
+        logging.info(f"\nХолодильник готов! Владелец: {owner_name}")
         print(
             "Перед работой с холодильником ознакомьтесь с командами (help) и авторизуйтесь.")
 
@@ -47,8 +59,22 @@ def main():
             parts = command.split()
             cmd = parts[0].lower()
             if cmd == 'exit':
-                print("До свидания!")
-                break
+                print("Вы уверены, что хотите выйти?(да/нет)")
+                confirm = input("> ").strip().lower()
+
+                if confirm == 'да':
+                    logging.info("Пользователь подтвердил выход.")
+                    print("До свидания!")
+                    break
+                elif confirm == 'нет':
+                    logging.info("Пользователь отменил выход.")
+                    print("Работа продолжается.")
+                    continue
+                else:
+                    logging.warning(
+                        f"Неверный ввод подтверждения: '{confirm}'")
+                    print("Введен неверный ответ. Попробуйте ещё раз.")
+                    continue
             elif cmd == "help":
                 print("""
 Команды:
@@ -66,7 +92,7 @@ def main():
                     print("Используйте: login <имя>")
                     continue
                 fridge.login(parts[1])
-                print(f"Вошёл: {fridge.get_current_user_info()}")
+                logging.info(f"Вошёл: {fridge.get_current_user_info()}")
             elif cmd == 'status':
                 print(fridge)
             elif cmd == 'open':
@@ -98,7 +124,7 @@ def main():
                     product = Product(name, price, shelf_life, production_date)
                     fridge.add(product, zone)
                 except ValueError as e:
-                    print(f"Ошибка ввода: {e}")
+                    logging.error(f"Ошибка ввода: {e}")
             elif cmd == 'remove':
                 if len(parts) != 3:
                     print(
@@ -120,14 +146,14 @@ def main():
                     today = datetime(year, month, day)
                     fridge.get_expired(today, zone)
                 except ValueError as e:
-                    print(f"Ошибка ввода: {e}")
+                    logging.error(f"Ошибка ввода: {e}")
             else:
-                print("Неизвестная команда! Используйте help.")
+                logging.warning("Неизвестная команда! Используйте help.")
 
     except KeyboardInterrupt:
-        print("\nПрограмма завершена.")
+        logging.info("\nПрограмма завершена.")
     except Exception as e:
-        print(f"Критическая ошибка: {e}")
+        logging.exception(f"Критическая ошибка: {e}")
 
 
 if __name__ == "__main__":
